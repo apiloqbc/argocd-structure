@@ -18,8 +18,8 @@ spec:
 {{- end }}
 {{- if $val.enableAutoSync | default $.Values.default.app.enableAutoSync }}
   syncPolicy:
-    automated:
-      prune: {{ $val.autoSyncPrune | default $.Values.default.app.autoSyncPrune | default true }}
+    automated: {}
+      #prune: {{ $val.autoSyncPrune | default $.Values.default.app.autoSyncPrune | default true }}
 {{- end }}
   source:
     chart: {{ tpl $val.source.chart $ }}
