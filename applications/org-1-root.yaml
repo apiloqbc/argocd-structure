@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: org-10-root
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: org-10
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: distribution
+    repoURL: 'https://github.com/apiloqbc/argocd-structure.git'
+    targetRevision: HEAD
+    helm:
+      valueFiles:
+        - entry-level.yaml
+        - orgs/org-10/values.yaml
