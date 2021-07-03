@@ -5,7 +5,7 @@ metadata:
 spec:
   generators:
     - git:
-        repoURL: https://github.com/argoproj-labs/applicationset.git
+        repoURL: https://github.com/apiloqbc/argocd-structure.git
         revision: HEAD
         directories:
           - path: distribution/orgs/*
