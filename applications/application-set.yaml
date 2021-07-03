@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-addons
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/argoproj-labs/applicationset.git
+        revision: HEAD
+        directories:
+          - path: distribution/orgs/*
+  template:
+    metadata:
+      name: '{{path.basename}}'
+    spec:
+      project: staging
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{path.basename}}'
+      source:
+        path: distribution
+        repoURL: 'https://github.com/apiloqbc/argocd-structure.git'
+        targetRevision: HEAD
+        helm:
+          valueFiles:
+            - entry-level.yaml
+            - orgs/{{path.basename}}/values.yaml

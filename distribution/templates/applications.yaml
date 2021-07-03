@@ -1,0 +1,40 @@
+{{- range $key,$val := .Values.applications }}
+{{- $_ := set $ "curAppName" (print $.Values.envName "-" $key) }}
+{{- if $val.enabled }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $key }}-{{ $.Values.default.app.destination.namespace }}
+spec:
+  destination:
+    namespace: {{ $.Values.default.app.destination.namespace | required (printf "No destination.namespace specified for %s" $key ) }}
+    server: {{ $.Values.default.app.destination.server | required (printf "No destination.server specified for %s" $key ) }}
+{{- if $.Values.projectOverride }}
+  project: {{ $.Values.projectOverride }}
+{{- else }}
+  project: {{ $.Values.envName | required (printf "No project specified for %s" $key ) }}
+{{- end }}
+{{- if $val.enableAutoSync | default $.Values.default.app.enableAutoSync }}
+  syncPolicy:
+    automated:
+      prune: {{ $val.autoSyncPrune | default $.Values.default.app.autoSyncPrune | default true }}
+{{- end }}
+  source:
+    chart: {{ tpl $val.source.chart $ }}
+    repoURL: {{ $val.source.repoURL | default $.Values.default.app.source.repoURL | required (printf "No source.repoURL specified for %s" $key ) }}
+    targetRevision: {{ $val.source.targetRevision | default $.Values.default.app.source.targetRevision | required (printf "No source.targetRevision specified for %s" $key ) }}
+    helm:
+      # Release name override (defaults to application name)
+      releaseName: {{ $val.releaseName | default $val.source.chart | required (printf "No releaseName specified for %s" $key ) }}
+
+      # Helm values files for overriding values in the helm chart
+      # The path is relative to the spec.source.path directory defined above
+    {{- if $val.valueFiles }}
+      valueFiles:
+        {{- range $file :=  $val.valueFiles }}
+        - {{ $file }}
+          {{- end }}
+      {{- end}}
+{{- end }}
+{{- end }}
