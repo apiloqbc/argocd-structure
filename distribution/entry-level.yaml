@@ -3,8 +3,10 @@ default:
   app:
     destination:
       server: https://kubernetes.default.svc
+      namespace: org-10
     source:
       targetRevision: staging
+
 
 applications:
   wordpress:
@@ -26,4 +28,9 @@ applications:
       targetRevision: 11.0.18
     valueFiles:
       - values/wordpress-staging.yaml
+
+
+
+
+
 
