@@ -18,8 +18,6 @@ spec:
 {{- end }}
 {{- if $val.enableAutoSync | default $.Values.default.app.enableAutoSync }}
   syncPolicy:
-    syncOptions:
-      - CreateNamespace=true
     automated:
       prune: {{ $val.autoSyncPrune | default $.Values.default.app.autoSyncPrune | default true }}
 {{- end }}
