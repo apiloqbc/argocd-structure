@@ -16,5 +16,5 @@ spec:
     targetRevision: HEAD
     helm:
       valueFiles:
-        - entry-level.yaml
+        - values.yaml
         - orgs/org-10/values.yaml
