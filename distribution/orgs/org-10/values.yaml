@@ -1,14 +1,14 @@
 default:
   app:
     destination:
-      namespace: org-1
+      namespace: org-10
 
 
 applications:
   myapp1:
     valueFiles:
       - values/wordpress-staging.yaml
-      - orgs/org-1/wordpress.yaml
+      - orgs/org-10/wordpress.yaml
 
 
 
