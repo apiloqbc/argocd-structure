@@ -1,13 +1,3 @@
-envName: staging
-default:
-  app:
-    destination:
-      server: https://kubernetes.default.svc
-      namespace: org-10
-    source:
-      targetRevision: staging
-
-
 applications:
   wordpress:
     enabled: true
