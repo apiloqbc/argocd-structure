@@ -1,6 +1,6 @@
 applications:
   wordpress:
-    enabled: true
+    enabled: "true"
     enableAutoSync: true
     project: staging
     source:
@@ -8,7 +8,7 @@ applications:
       repoURL: https://charts.bitnami.com/bitnami
       targetRevision: 11.0.18
   wordpress2:
-    enabled: true
+    enabled: "true"
     enableAutoSync: true
     project: staging
     releaseName: wordpress2

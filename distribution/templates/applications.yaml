@@ -1,41 +1,50 @@
-{{- range $key,$val := .Values.applications }}
-{{- $_ := set $ "curAppName" (print $.Values.envName "-" $key) }}
-{{- if $val.enabled }}
+{{- range $orgKey,$orgVal := .Values.organizations }}
+{{- range $appKey,$appVal := $.Values.applications }}
+{{- $_ := set $ "curAppName" (print $.Values.envName "-" $appKey) }}
+{{- $org:= index $.Values.organizations $orgKey }}
+{{- $curApp:= index $org.apps $appKey }}
+{{- $result := false }}
+{{- if and (hasKey $curApp "enabled") -}}
+{{- if eq $curApp.enabled "true" -}}
+{{- $result = true }}
+{{- end -}}
+{{- else if eq $appVal.enabled "true" -}}
+{{- $result = true }}
+{{- end -}}
+{{- if $result }}
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ $key }}-{{ $.Values.default.app.destination.namespace }}
+  name: {{ $orgVal.name }}-{{ $appKey }}
   namespace: argocd
 spec:
   destination:
-    namespace: {{ $.Values.default.app.destination.namespace | required (printf "No destination.namespace specified for %s" $key ) }}
-    server: {{ $.Values.default.app.destination.server | required (printf "No destination.server specified for %s" $key ) }}
-{{- if $.Values.projectOverride }}
-  project: {{ $.Values.projectOverride }}
-{{- else }}
-  project: {{ $.Values.envName | required (printf "No project specified for %s" $key ) }}
-{{- end }}
-{{- if $val.enableAutoSync | default $.Values.default.app.enableAutoSync }}
+    namespace: {{ $orgVal.name | required (printf "No destination.namespace specified for %s" $appKey ) }}
+    server: {{ $.Values.default.app.destination.server | required (printf "No destination.server specified for %s" $appKey ) }}
+  project: {{ $orgVal.project | default $.Values.default.project | required (printf "No project specified for %s" $appKey ) }}
+  {{- if $appVal.enableAutoSync | default $.Values.default.app.enableAutoSync }}
   syncPolicy:
-    automated: {}
-      #prune: {{ $val.autoSyncPrune | default $.Values.default.app.autoSyncPrune | default true }}
-{{- end }}
+    automated: { }
+    #prune: {{ $appVal.autoSyncPrune | default $.Values.default.app.autoSyncPrune | default true }}
+  {{- end }}
   source:
-    chart: {{ tpl $val.source.chart $ }}
-    repoURL: {{ $val.source.repoURL | default $.Values.default.app.source.repoURL | required (printf "No source.repoURL specified for %s" $key ) }}
-    targetRevision: {{ $val.source.targetRevision | default $.Values.default.app.source.targetRevision | required (printf "No source.targetRevision specified for %s" $key ) }}
+    chart: {{ tpl $appVal.source.chart $ }}
+    repoURL: {{ $appVal.source.repoURL | default $.Values.default.app.source.repoURL | required (printf "No source.repoURL specified for %s" $appVal ) }}
+    targetRevision: {{ $appVal.source.targetRevision | default $.Values.default.app.source.targetRevision | required (printf "No source.targetRevision specified for %s" $appKey ) }}
     helm:
       # Release name override (defaults to application name)
-      releaseName: {{ $val.releaseName | default $val.source.chart | required (printf "No releaseName specified for %s" $key ) }}
+      releaseName: {{ $appVal.releaseName | default $appVal.source.chart | required (printf "No releaseName specified for %s" $appKey ) }}
 
       # Helm values files for overriding values in the helm chart
       # The path is relative to the spec.source.path directory defined above
-    {{- if $val.valueFiles }}
+      {{- if $appVal.valueFiles }}
       valueFiles:
-        {{- range $file :=  $val.valueFiles }}
+        {{- range $file :=  $appVal.valueFiles }}
         - {{ $file }}
           {{- end }}
-      {{- end}}
+          {{- end}}
+  {{- end }}
+  {{- end }}
 {{- end }}
-{{- end }}
+

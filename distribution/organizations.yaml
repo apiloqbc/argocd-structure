@@ -1,0 +1,35 @@
+organizations:
+  - name: org-1
+    project: default
+    envName: org1
+    apps:
+      wordpress:
+        enabled: "true"
+        custom-helm-values:
+          values-org-1-wordpress.yaml
+      wordpress2:
+        custom-helm-values:
+          values-org-1-wordpress.yaml
+  - name: org-2
+    project: default2
+    envName: org2
+    apps:
+      wordpress:
+        enabled: "false"
+        custom-helm-values:
+          values-org-1-wordpress.yaml
+      wordpress2:
+        enabled: "false"
+        custom-helm-values:
+          values-org-1-wordpress.yaml
+default:
+  project: default
+  app:
+    destination:
+      server: "default-server"
+      namespace: default
+    source:
+      repoURL: "default-repoURL"
+envName: ms
+
+
